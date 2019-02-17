@@ -17,9 +17,11 @@ namespace NSubstitute.Community.Diagnostics
             _ctx = ctx;
         }
 
-        public ConfiguredCall LastCallShouldReturn(IReturn returnValue, MatchArgs matchArgs, PendingSpecificationInfo pendingSpecInfo)
+        public ConfiguredCall LastCallShouldReturn(IReturn returnValue, MatchArgs matchArgs,
+            PendingSpecificationInfo pendingSpecInfo)
         {
-            Log($"LastCallShouldReturn(value: {returnValue.DiagName(_ctx)}, matchArgs: {matchArgs.DiagName()}, pendingSpecInfo: {pendingSpecInfo.DiagName(_ctx)})");
+            Log(
+                $"LastCallShouldReturn(value: {returnValue.DiagName(_ctx)}, matchArgs: {matchArgs.DiagName()}, pendingSpecInfo: {pendingSpecInfo.DiagName(_ctx)})");
             return _impl.LastCallShouldReturn(returnValue, matchArgs, pendingSpecInfo);
         }
 
@@ -74,6 +76,7 @@ namespace NSubstitute.Community.Diagnostics
 
         public override int GetHashCode() => _impl.GetHashCode();
 
-        private void Log(string message) => _ctx.Tracer.WriteLineWithTID($"[CallRouter] {message} [this: {this.DiagName(_ctx)}]");
+        private void Log(string message) =>
+            _ctx.Tracer.WriteLineWithTID($"[CallRouter] {message} [this: {this.DiagName(_ctx)}]");
     }
 }

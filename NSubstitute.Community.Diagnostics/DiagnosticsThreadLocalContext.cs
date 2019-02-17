@@ -7,7 +7,7 @@ using NSubstitute.Routing;
 
 namespace NSubstitute.Community.Diagnostics
 {
-    internal class DiagnosticsThreadLocalContext: IThreadLocalContext
+    internal class DiagnosticsThreadLocalContext : IThreadLocalContext
     {
         private readonly IThreadLocalContext _impl;
         private readonly DiagContextInternal _ctx;
@@ -39,7 +39,8 @@ namespace NSubstitute.Community.Diagnostics
 
         public void SetNextRoute(ICallRouter callRouter, Func<ISubstituteState, IRoute> nextRouteFactory)
         {
-            Log($"SetNextRoute(callRouter: {callRouter.DiagName(_ctx)}, nextRouteFactory: {nextRouteFactory.DiagName()})");
+            Log(
+                $"SetNextRoute(callRouter: {callRouter.DiagName(_ctx)}, nextRouteFactory: {nextRouteFactory.DiagName()})");
             _impl.SetNextRoute(_ctx.MapToDiagRouter(callRouter), nextRouteFactory);
         }
 
@@ -92,7 +93,7 @@ namespace NSubstitute.Community.Diagnostics
         public IPendingSpecification PendingSpecification { get; }
 
         public bool IsQuerying => _impl.IsQuerying;
- 
+
         private void Log(string message) => _ctx.Tracer.WriteLineWithTID($"[ThreadLocalContext] {message}");
     }
 }

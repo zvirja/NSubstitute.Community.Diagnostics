@@ -39,9 +39,10 @@ namespace NSubstitute.Community.Diagnostics
             Log("Clear()");
             _impl.Clear();
         }
- 
+
         public override int GetHashCode() => _impl.GetHashCode();
 
-        private void Log(string message) => _ctx.Tracer.WriteLineWithTID($"[ThreadLocalContext.PendingSpecification] {message}");
+        private void Log(string message) =>
+            _ctx.Tracer.WriteLineWithTID($"[ThreadLocalContext.PendingSpecification] {message}");
     }
 }

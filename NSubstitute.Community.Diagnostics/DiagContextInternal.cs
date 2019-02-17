@@ -7,10 +7,15 @@ namespace NSubstitute.Community.Diagnostics
 {
     internal class DiagContextInternal
     {
-        private ConditionalWeakTable<ICallRouter, object> _routerToSubstituteMappings = new ConditionalWeakTable<ICallRouter, object>();
-        private ConditionalWeakTable<ICallRouter, ICallRouter> _routerToDiagRouterMappings = new ConditionalWeakTable<ICallRouter, ICallRouter>();
+        private ConditionalWeakTable<ICallRouter, object> _routerToSubstituteMappings =
+            new ConditionalWeakTable<ICallRouter, object>();
+
+        private ConditionalWeakTable<ICallRouter, ICallRouter> _routerToDiagRouterMappings =
+            new ConditionalWeakTable<ICallRouter, ICallRouter>();
+
         private ConditionalWeakTable<object, Type> _substituteToPrimaryType = new ConditionalWeakTable<object, Type>();
         public IDiagnosticsTracer Tracer { get; }
+
         public DiagContextInternal(IDiagnosticsTracer tracer)
         {
             Tracer = tracer;

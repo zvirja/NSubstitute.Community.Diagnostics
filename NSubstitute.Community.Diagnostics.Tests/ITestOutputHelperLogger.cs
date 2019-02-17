@@ -10,7 +10,7 @@ namespace NSubstitute.Community.Diagnostics.Tests
         {
             _testOutputHelper = testOutputHelper;
         }
-        
+
         public void WriteLine(string line) => _testOutputHelper.WriteLine(line);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using NSubstitute.Core;
 using NSubstitute.Core.DependencyInjection;
 using NSubstitute.Proxies;
@@ -10,7 +11,7 @@ namespace NSubstitute.Community.Diagnostics
     public class NSubstituteDiagnosticsContext : IDisposable
     {
         private static readonly object InstallLock = new object();
-        
+
         private readonly ISubstitutionContext _oldContext;
         public IDiagnosticsTracer Tracer { get; }
 
@@ -21,7 +22,7 @@ namespace NSubstitute.Community.Diagnostics
         public NSubstituteDiagnosticsContext(IDiagnosticsTracer tracer)
         {
             Tracer = tracer;
- 
+
             var diagContext = CreateDiagContext(tracer);
             _oldContext = InstallDiagContext(diagContext, tracer);
         }
@@ -29,7 +30,7 @@ namespace NSubstitute.Community.Diagnostics
         private static ISubstitutionContext CreateDiagContext(IDiagnosticsTracer tracer)
         {
             var ctx = new DiagContextInternal(tracer);
-            
+
             return NSubstituteDefaultFactory.DefaultContainer
                 .Customize()
                 .RegisterPerScope<ThreadLocalContext, ThreadLocalContext>()
@@ -42,13 +43,14 @@ namespace NSubstitute.Community.Diagnostics
                         new ProxyFactory(r.Resolve<DelegateProxyFactory>(), r.Resolve<CastleDynamicProxyFactory>()),
                         ctx))
                 .Resolve<ISubstitutionContext>();
-            
         }
 
-        private static ISubstitutionContext InstallDiagContext(ISubstitutionContext newContext, IDiagnosticsTracer tracer)
+        private static ISubstitutionContext InstallDiagContext(ISubstitutionContext newContext,
+            IDiagnosticsTracer tracer)
         {
-            if(!IsDiagContext(newContext))
-                throw new ArgumentException($"Diagnostics context is expected. Actual context type: {newContext.GetType().FullName}");
+            if (!IsDiagContext(newContext))
+                throw new ArgumentException(
+                    $"Diagnostics context is expected. Actual context type: {newContext.GetType().FullName}");
 
             lock (InstallLock)
             {
@@ -83,7 +85,7 @@ namespace NSubstitute.Community.Diagnostics
             lock (InstallLock)
             {
                 var current = SubstitutionContext.Current;
-                if(!IsDiagContext(current))
+                if (!IsDiagContext(current))
                     throw new InvalidOperationException(
                         "You are trying to uninstall diagnostics context while current context is not diagnostics. " +
                         "This is clear indication that something goes wrong." +

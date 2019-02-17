@@ -35,7 +35,7 @@ namespace NSubstitute.Community.Diagnostics
         public static string DiagName(this IReturn value, DiagContextInternal ctx)
         {
             var unknown = $"<UNKNOWN|{value.GetType().DiagName()}>";
-            
+
             if (value is ReturnValue rvs)
                 return ReflectionReader.ReadFieldValue(
                     rvs,
@@ -57,7 +57,7 @@ namespace NSubstitute.Community.Diagnostics
                     (IEnumerable<object> objs) => objs.Print(o => o.GetObjectId(ctx)),
                     "<MVALUES|CANNOT_READ>");
             }
-            
+
             if (gtd == typeof(ReturnValueFromFunc<>))
             {
                 return ReflectionReader.ReadFieldValue(
@@ -86,18 +86,28 @@ namespace NSubstitute.Community.Diagnostics
 
         public static string DiagName(this ICallSpecification argSpec)
         {
-            return $"<{argSpec} -> {argSpec.GetMethodInfo().ReturnType.DiagName()}>";
+            var methodInfo = argSpec.GetMethodInfo();
+            var signature = CallFormatter.Format(methodInfo, FormatMethodParameterTypes(methodInfo.GetParameters()));
+            var retType = methodInfo.ReturnType.DiagName();
+
+            return $"<{argSpec} : {signature} -> {retType}>";
         }
 
         public static string DiagName(this ICall call, DiagContextInternal ctx)
         {
-            return
-                $"<{call.Target().SubstituteId(ctx)}>.{CallFormatter.Format(call.GetMethodInfo(), call.GetOriginalArguments().Select(a => a.GetObjectId(ctx)))} -> {call.GetMethodInfo().ReturnType.DiagName()}";
+            var methodInfo = call.GetMethodInfo();
+            var substituteId = call.Target().SubstituteId(ctx);
+            var arguments =
+                CallFormatter.Format(methodInfo, call.GetOriginalArguments().Select(a => a.GetObjectId(ctx)));
+            var nameAndArgs = CallFormatter.Format(methodInfo, FormatMethodParameterTypes(methodInfo.GetParameters()));
+            var retType = methodInfo.ReturnType.DiagName();
+
+            return $"<{substituteId}.{arguments} : {nameAndArgs} -> {retType}>";
         }
 
         public static string DiagName(this Type type)
         {
-            return type.Name;
+            return type.GetNonMangledTypeName();
         }
 
         public static string DiagName<T>(this T value) where T : struct, Enum
@@ -119,7 +129,7 @@ namespace NSubstitute.Community.Diagnostics
             string proxyType = "";
             if (ctx.TryGetSubstitutePrimaryType(substitute, out Type primaryType))
             {
-                proxyType = $".{primaryType.Name}";
+                proxyType = $".{primaryType.DiagName()}";
             }
 
             return $"Substitute{proxyType}|{RuntimeHelpers.GetHashCode(substitute):x8}";
@@ -141,12 +151,13 @@ namespace NSubstitute.Community.Diagnostics
             {
                 return obj.SubstituteId(ctx);
             }
-            
+
             var type = obj.GetType();
-            var typeName = type.Name;
+            var typeName = type.GetNonMangledTypeName();
             // Trim "Diagnostics" prefix from type to make output more clear.
             // It doesn't matter to end user whether we have wrapper - we don't alter the logic.
-            if (type.Assembly == Assembly.GetExecutingAssembly())
+            if (type.Assembly == Assembly.GetExecutingAssembly() &&
+                typeName.StartsWith("Diagnostics", StringComparison.Ordinal))
                 typeName = typeName.Substring("Diagnostics".Length);
 
             string id;
@@ -162,19 +173,50 @@ namespace NSubstitute.Community.Diagnostics
             {
                 id = obj.ToString();
             }
-            else if(obj is ICallRouter || obj is IPendingSpecification || obj is IProxyFactory || obj is IThreadLocalContext)
+            else if (obj is ICallRouter || obj is IPendingSpecification || obj is IProxyFactory ||
+                     obj is IThreadLocalContext)
             {
                 id = obj.GetHashCode().ToString("x8");
             }
             // It's unsafe to call `.ToString()` on unknown types, as this method might be overridden and it will
             // lead to a substitute member invocation. In rare cases it might lead to the stack overflow.
             // To mitigate that we invoke method which doesn't invoke custom client code.
-            else 
+            else
             {
                 id = RuntimeHelpers.GetHashCode(obj).ToString("x8");
             }
 
             return $"{typeName}|{id}";
+        }
+
+        public static string GetNonMangledTypeName(this Type type)
+        {
+            var typeName = type.Name;
+            if (!type.GetTypeInfo().IsGenericType)
+                return typeName;
+
+            typeName = typeName.Substring(0, typeName.IndexOf('`'));
+            var genericArgTypes = type.GetGenericArguments().Select(GetNonMangledTypeName);
+            return $"{typeName}<{string.Join(", ", genericArgTypes)}>";
+        }
+
+        private static IEnumerable<string> FormatMethodParameterTypes(IEnumerable<ParameterInfo> parameters)
+        {
+            return parameters.Select(p =>
+            {
+                var type = p.ParameterType;
+
+                if (p.IsOut)
+                    return "out " + type.GetElementType().GetNonMangledTypeName();
+
+                if (type.IsByRef)
+                    return "ref " + type.GetElementType().GetNonMangledTypeName();
+
+                if (p.IsParams())
+                    return "params " + type.GetNonMangledTypeName();
+
+                return type.GetNonMangledTypeName();
+            });
         }
     }
 }

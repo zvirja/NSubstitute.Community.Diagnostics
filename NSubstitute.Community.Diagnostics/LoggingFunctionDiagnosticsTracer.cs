@@ -10,7 +10,7 @@ namespace NSubstitute.Community.Diagnostics
         {
             _log = log;
         }
-        
+
         public void WriteLine(string line) => _log(line);
     }
 }

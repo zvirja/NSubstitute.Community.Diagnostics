@@ -12,11 +12,12 @@ namespace NSubstitute.Community.Diagnostics.Tests
     public class IntegrationTests
     {
         private IDiagnosticsTracer _output;
+
         public IntegrationTests(ITestOutputHelper output)
         {
             _output = new TestOutputHelperLogger(output);
         }
-        
+
         [Fact]
         public void Test()
         {
@@ -24,7 +25,7 @@ namespace NSubstitute.Community.Diagnostics.Tests
             {
                 ClearOptions xx = ClearOptions.All;
                 xx.ToString();
-                
+
                 var subs = Substitute.For<ITargetInterface>();
                 var res = Substitute.For<ITargetInterface>();
                 subs.Configure().GetSelf(Arg.Any<long>()).Returns(res);
