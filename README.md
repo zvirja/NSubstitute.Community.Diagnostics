@@ -49,7 +49,7 @@ Notice, the concurrency limitation is related to the installation only - the cod
 
 # Sample
 
-Here is the sample of diagnostics you have:
+Here is the sample of diagnostics code and output.
 
 Code:
 ```c#
