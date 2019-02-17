@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSubstitute.Community.Diagnostics", "NSubstitute.Community.Diagnostics\NSubstitute.Community.Diagnostics.csproj", "{BB73DFD5-4177-4D22-AA81-6B50ECCB6287}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSubstitute.Community.Diagnostics.Tests", "NSubstitute.Community.Diagnostics.Tests\NSubstitute.Community.Diagnostics.Tests.csproj", "{E6BC7701-9042-4E6B-9756-45346632B9B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BB73DFD5-4177-4D22-AA81-6B50ECCB6287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB73DFD5-4177-4D22-AA81-6B50ECCB6287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB73DFD5-4177-4D22-AA81-6B50ECCB6287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB73DFD5-4177-4D22-AA81-6B50ECCB6287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6BC7701-9042-4E6B-9756-45346632B9B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6BC7701-9042-4E6B-9756-45346632B9B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6BC7701-9042-4E6B-9756-45346632B9B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6BC7701-9042-4E6B-9756-45346632B9B9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
