@@ -27,8 +27,7 @@ namespace NSubstitute.Community.Diagnostics.Decorators
             Log($"[Configure last call] " +
                 $"CallSpecification: {pendingSpecInfo.DiagName(_ctx)} " +
                 $"Value: {returnValue.DiagName(_ctx)} " +
-                $"Match: {matchArgs.DiagName()} " +
-                $"Caller: {StackUtil.GetCallerMethodName()}");
+                $"Match: {matchArgs.DiagName()} ");
  
             return _impl.LastCallShouldReturn(returnValue, matchArgs, pendingSpecInfo);
         }
@@ -40,10 +39,9 @@ namespace NSubstitute.Community.Diagnostics.Decorators
                 $"Substitute: {call.Target().SubstituteId(_ctx)} " +
                 $"Call: {call.FormatArgs(_ctx)} " +
                 $"Signature: {call.GetMethodInfo().DiagName()} " +
-                $"Pending specs: {call.GetArgumentSpecifications().Print(s => s.DiagName())} " +
-                $"Caller: {StackUtil.GetCallerMethodName()}");
+                $"Pending specs: {call.GetArgumentSpecifications().Print(s => s.DiagName())}");
             
-            using (_ctx.Logger.Scope())
+            using (new LoggingScope())
             {
                 return _impl.Route(call);
             }
@@ -95,8 +93,8 @@ namespace NSubstitute.Community.Diagnostics.Decorators
         public override int GetHashCode() => _impl.GetHashCode();
 
         private void Trace(string message) =>
-            _ctx.Logger.TraceWithTID($"[CallRouter] {message} [this: {this.DiagName(_ctx)}]");
+            _ctx.Logger.Trace($"[CallRouter] {message} [this: {this.DiagName(_ctx)}]");
  
-        private void Log(string message) => _ctx.Logger.LogWithTID($"[CallRouter]{message}");
+        private void Log(string message) => _ctx.Logger.Log(message);
     }
 }

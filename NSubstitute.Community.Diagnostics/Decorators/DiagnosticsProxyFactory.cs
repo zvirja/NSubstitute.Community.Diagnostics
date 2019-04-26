@@ -40,6 +40,6 @@ namespace NSubstitute.Community.Diagnostics.Decorators
 
         public override int GetHashCode() => _impl.GetHashCode();
 
-        private void LogAndTrace(string message) => _ctx.Logger.WriteLineWithTID($"[ProxyFactory] {message}");
+        private void LogAndTrace(string message) => _ctx.Logger.WriteLine($"[ProxyFactory] {message}");
     }
 }

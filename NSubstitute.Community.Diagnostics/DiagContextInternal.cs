@@ -16,11 +16,11 @@ namespace NSubstitute.Community.Diagnostics
             new ConditionalWeakTable<ICallRouter, ICallRouter>();
 
         private ConditionalWeakTable<object, Type> _substituteToPrimaryType = new ConditionalWeakTable<object, Type>();
-        public IndentedLogger Logger { get; }
+        public IDiagnosticsLogger Logger { get; }
 
         public DiagContextInternal(IDiagnosticsLogger logger)
         {
-            Logger = new IndentedLogger(logger);
+            Logger = logger;
         }
 
         public void MapRouterToSubstitute(ICallRouter router, object substitute)

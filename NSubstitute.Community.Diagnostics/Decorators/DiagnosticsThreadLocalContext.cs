@@ -55,9 +55,7 @@ namespace NSubstitute.Community.Diagnostics.Decorators
         public void EnqueueArgumentSpecification(IArgumentSpecification spec)
         {
             Trace($"EnqueueArgumentSpecification(spec: {spec.DiagName()})");
-            Log($"[Enqueue argument specification] " +
-                $"Specification: {spec.DiagName()} " +
-                $"Caller: {StackUtil.GetCallerMethodName()}");
+            Log($"[Enqueue argument specification] Specification: {spec.DiagName()} ");
             _impl.EnqueueArgumentSpecification(spec);
         }
 
@@ -84,7 +82,7 @@ namespace NSubstitute.Community.Diagnostics.Decorators
         public void RunInQueryContext(Action calls, IQuery query)
         {
             Trace($"BEGIN RunInQueryContext()");
-            using (_ctx.Logger.Scope())
+            using (new LoggingScope())
             {
                 _impl.RunInQueryContext(calls, query);
             }
@@ -101,7 +99,7 @@ namespace NSubstitute.Community.Diagnostics.Decorators
 
         public bool IsQuerying => _impl.IsQuerying;
 
-        private void Trace(string message) => _ctx.Logger.TraceWithTID($"[ThreadLocalContext] {message}");
-        private void Log(string message) => _ctx.Logger.LogWithTID($"[ThreadLocalContext]{message}");
+        private void Trace(string message) => _ctx.Logger.Trace($"[ThreadLocalContext] {message}");
+        private void Log(string message) => _ctx.Logger.Log(message);
     }
 }

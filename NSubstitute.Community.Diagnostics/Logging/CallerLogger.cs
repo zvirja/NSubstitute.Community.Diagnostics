@@ -5,13 +5,23 @@ using NSubstitute.Community.Diagnostics.Utils;
 
 namespace NSubstitute.Community.Diagnostics.Logging
 {
-    internal static class StackUtil
+    internal class CallerLogger : IDiagnosticsLogger
     {
         private static readonly Assembly NSubstituteAssembly = typeof(Substitute).Assembly;
         private static readonly Assembly CastleProxyAssembly = typeof(ProxyGenerator).Assembly;
         private static readonly Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
+        private readonly IDiagnosticsLogger _impl;
+
+        public CallerLogger(IDiagnosticsLogger impl)
+        {
+            _impl = impl;
+        }
+
+        public DiagnosticsLogLevel Level => _impl.Level;
+
+        public void WriteLine(string line) => _impl.WriteLine($"[Caller: {GetCallerMethodName()}]{line}");
  
-        public static string GetCallerMethodName()
+        private static string GetCallerMethodName()
         {
             const string Unknown = "<unknown>";
             

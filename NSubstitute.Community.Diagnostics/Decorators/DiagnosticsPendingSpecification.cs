@@ -45,6 +45,6 @@ namespace NSubstitute.Community.Diagnostics.Decorators
         public override int GetHashCode() => _impl.GetHashCode();
 
         private void Trace(string message) =>
-            _ctx.Logger.TraceWithTID($"[ThreadLocalContext.PendingSpecification] {message}");
+            _ctx.Logger.Trace($"[ThreadLocalContext.PendingSpecification] {message}");
     }
 }

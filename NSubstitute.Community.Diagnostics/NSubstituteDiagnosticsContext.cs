@@ -13,9 +13,9 @@ namespace NSubstitute.Community.Diagnostics
         private readonly IDiagnosticsLogger _logger;
         private readonly ISubstitutionContext _oldContext;
 
-        private NSubstituteDiagnosticsContext(Action<string> logger, DiagnosticsLogLevel level)
+        internal NSubstituteDiagnosticsContext(IDiagnosticsLogger logger)
         {
-            _logger = new FuncLogger(logger, level);
+            _logger = logger;
 
             var diagnosticsContext = CreateContext(_logger);
             _oldContext = InstallDiagContext(diagnosticsContext, _logger);
@@ -28,7 +28,11 @@ namespace NSubstitute.Community.Diagnostics
         /// </summary>
         public static IDisposable CreateTracingContext(Action<string> logger)
         {
-            return new NSubstituteDiagnosticsContext(logger, DiagnosticsLogLevel.Tracing);
+            return new NSubstituteDiagnosticsContext(
+                new CallerLogger(
+                    new ThreadIdLogger(
+                        new IndentationLogger(
+                            new FuncLogger(logger, DiagnosticsLogLevel.Tracing)))));
         }
 
         /// <summary>
@@ -38,7 +42,11 @@ namespace NSubstitute.Community.Diagnostics
         /// </summary>
         public static IDisposable CreateLoggingContext(Action<string> logger)
         {
-            return new NSubstituteDiagnosticsContext(logger, DiagnosticsLogLevel.Logging);
+            return new NSubstituteDiagnosticsContext(
+                new CallerLogger(
+                    new ThreadIdLogger(
+                        new IndentationLogger(
+                            new FuncLogger(logger, DiagnosticsLogLevel.Logging)))));
         }
         
         private static ISubstitutionContext CreateContext(IDiagnosticsLogger logger)
@@ -84,7 +92,7 @@ namespace NSubstitute.Community.Diagnostics
         }
 
         private static void Log(string message, IDiagnosticsLogger logger) =>
-            logger.WriteLineWithTID($"[DiagnosticsContextInstaller] {message}");
+            logger.WriteLine($"[DiagnosticsContextInstaller] {message}");
 
         public void Dispose()
         {

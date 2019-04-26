@@ -22,8 +22,8 @@ namespace Samples
         [Fact]
         public void IssueDemo()
         {
-            // using (NSubstituteDiagnosticsContext.CreateTracingContext(_output.WriteLine))
-            using (NSubstituteDiagnosticsContext.CreateLoggingContext(_output.WriteLine))
+            using (NSubstituteDiagnosticsContext.CreateTracingContext(_output.WriteLine))
+//            using (NSubstituteDiagnosticsContext.CreateLoggingContext(_output.WriteLine))
             {
                 var sut = Substitute.For<ISut>();
                 sut.Configure().Echo(Arg.Any<int>()).Returns(42);
@@ -32,6 +32,18 @@ namespace Samples
 
                 sut.Prop = 42;
             }
+        }
+
+        [Fact]
+        public void ExceptionDemo()
+        {
+            NSubstituteExceptionDiagnoser.Install();
+
+            Arg.Any<int>();
+
+            var sut = Substitute.For<ISut>();
+            sut.Echo(Arg.Any<int>()).Returns(42);
+
         }
     }
 }
