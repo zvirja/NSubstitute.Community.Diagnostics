@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NSubstitute.Community.Diagnostics.Decorators;
+using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Core;
 using NSubstitute.Core.Arguments;
 using NSubstitute.Routing;

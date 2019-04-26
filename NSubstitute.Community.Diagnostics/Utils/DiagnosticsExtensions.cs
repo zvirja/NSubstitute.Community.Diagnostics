@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using NSubstitute.Core;
 using NSubstitute.Core.Arguments;
 
-namespace NSubstitute.Community.Diagnostics
+namespace NSubstitute.Community.Diagnostics.Utils
 {
     internal static class DiagnosticsExtensions
     {
@@ -189,7 +189,7 @@ namespace NSubstitute.Community.Diagnostics
             return $"{typeName}|{id}";
         }
 
-        public static string GetNonMangledTypeName(this Type type)
+        private static string GetNonMangledTypeName(this Type type)
         {
             var typeName = type.Name;
             if (!type.GetTypeInfo().IsGenericType)

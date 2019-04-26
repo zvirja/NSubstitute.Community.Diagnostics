@@ -1,6 +1,6 @@
 using System;
 
-namespace NSubstitute.Community.Diagnostics
+namespace NSubstitute.Community.Diagnostics.Utils
 {
     internal class LoggingFunctionDiagnosticsTracer : IDiagnosticsTracer
     {

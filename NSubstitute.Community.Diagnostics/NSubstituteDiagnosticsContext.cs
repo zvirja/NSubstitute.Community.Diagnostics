@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using NSubstitute.Community.Diagnostics.Decorators;
+using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Core;
 using NSubstitute.Core.DependencyInjection;
 using NSubstitute.Proxies;
@@ -33,24 +35,16 @@ namespace NSubstitute.Community.Diagnostics
 
             return NSubstituteDefaultFactory.DefaultContainer
                 .Customize()
-                .RegisterPerScope<ThreadLocalContext, ThreadLocalContext>()
-                .RegisterPerScope<IThreadLocalContext>(r =>
-                    new DiagnosticsThreadLocalContext(
-                        r.Resolve<ThreadLocalContext>(),
-                        ctx))
-                .RegisterPerScope<IProxyFactory>(r =>
-                    new DiagnosticsProxyFactory(
-                        new ProxyFactory(r.Resolve<DelegateProxyFactory>(), r.Resolve<CastleDynamicProxyFactory>()),
-                        ctx))
+                .Decorate<IThreadLocalContext>((impl, _) => new DiagnosticsThreadLocalContext(impl, ctx))
+                .Decorate<IProxyFactory>((impl, _) => new DiagnosticsProxyFactory(impl, ctx))
                 .Resolve<ISubstitutionContext>();
         }
 
-        private static ISubstitutionContext InstallDiagContext(ISubstitutionContext newContext,
-            IDiagnosticsTracer tracer)
+        private static ISubstitutionContext InstallDiagContext(ISubstitutionContext newCtx, IDiagnosticsTracer tracer)
         {
-            if (!IsDiagContext(newContext))
+            if (!IsDiagContext(newCtx))
                 throw new ArgumentException(
-                    $"Diagnostics context is expected. Actual context type: {newContext.GetType().FullName}");
+                    $"Diagnostics context is expected. Actual context type: {newCtx.GetType().FullName}");
 
             lock (InstallLock)
             {
@@ -65,7 +59,7 @@ namespace NSubstitute.Community.Diagnostics
                         "In that case please ensure that you run tests sequentially or install the hook globally on an assembly level.");
                 }
 
-                SubstitutionContext.Current = newContext;
+                SubstitutionContext.Current = newCtx;
                 Log("Installed diagnostics context", tracer);
 
                 return oldContext;

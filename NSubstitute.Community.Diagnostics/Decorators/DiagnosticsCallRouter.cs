@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Core;
 using NSubstitute.Routing;
 
-namespace NSubstitute.Community.Diagnostics
+namespace NSubstitute.Community.Diagnostics.Decorators
 {
     internal class DiagnosticsCallRouter : ICallRouter
     {
@@ -20,8 +21,8 @@ namespace NSubstitute.Community.Diagnostics
         public ConfiguredCall LastCallShouldReturn(IReturn returnValue, MatchArgs matchArgs,
             PendingSpecificationInfo pendingSpecInfo)
         {
-            Log(
-                $"LastCallShouldReturn(value: {returnValue.DiagName(_ctx)}, matchArgs: {matchArgs.DiagName()}, pendingSpecInfo: {pendingSpecInfo.DiagName(_ctx)})");
+            Log($"LastCallShouldReturn(value: {returnValue.DiagName(_ctx)}, " +
+                 $"matchArgs: {matchArgs.DiagName()}, pendingSpecInfo: {pendingSpecInfo.DiagName(_ctx)})");
             return _impl.LastCallShouldReturn(returnValue, matchArgs, pendingSpecInfo);
         }
 

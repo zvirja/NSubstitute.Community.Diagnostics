@@ -1,7 +1,8 @@
 using System;
+using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Core;
 
-namespace NSubstitute.Community.Diagnostics
+namespace NSubstitute.Community.Diagnostics.Decorators
 {
     internal class DiagnosticsProxyFactory : IProxyFactory
     {
