@@ -1,3 +1,4 @@
+using NSubstitute.Community.Diagnostics.Logging;
 using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Core;
 
@@ -19,31 +20,31 @@ namespace NSubstitute.Community.Diagnostics.Decorators
         public PendingSpecificationInfo UseCallSpecInfo()
         {
             var result = _impl.UseCallSpecInfo();
-            Log($"UseCallSpecInfo() => {result.DiagName(_ctx)}");
+            Trace($"UseCallSpecInfo() => {result.DiagName(_ctx)}");
             return result;
         }
 
         public void SetCallSpecification(ICallSpecification callSpecification)
         {
-            Log($"SetCallSpecification(spec: {callSpecification.DiagName()})");
+            Trace($"SetCallSpecification(spec: {callSpecification.DiagName()})");
             _impl.SetCallSpecification(callSpecification);
         }
 
         public void SetLastCall(ICall lastCall)
         {
-            Log($"SetLastCall(call: {lastCall.DiagName(_ctx)})");
+            Trace($"SetLastCall(call: {lastCall.DiagName(_ctx)})");
             _impl.SetLastCall(lastCall);
         }
 
         public void Clear()
         {
-            Log("Clear()");
+            Trace("Clear()");
             _impl.Clear();
         }
 
         public override int GetHashCode() => _impl.GetHashCode();
 
-        private void Log(string message) =>
-            _ctx.Tracer.WriteLineWithTID($"[ThreadLocalContext.PendingSpecification] {message}");
+        private void Trace(string message) =>
+            _ctx.Logger.TraceWithTID($"[ThreadLocalContext.PendingSpecification] {message}");
     }
 }

@@ -8,7 +8,7 @@ using NSubstitute.Core.Arguments;
 
 namespace NSubstitute.Community.Diagnostics.Utils
 {
-    internal static class DiagnosticsExtensions
+    internal static class DiagnosticsNameExtensions
     {
         private static readonly IMethodInfoFormatter CallFormatter = new CallFormatter();
 
@@ -86,28 +86,54 @@ namespace NSubstitute.Community.Diagnostics.Utils
 
         public static string DiagName(this ICallSpecification argSpec)
         {
-            var methodInfo = argSpec.GetMethodInfo();
-            var signature = CallFormatter.Format(methodInfo, FormatMethodParameterTypes(methodInfo.GetParameters()));
-            var retType = methodInfo.ReturnType.DiagName();
-
-            return $"<{argSpec} : {signature} -> {retType}>";
+            return $"<{argSpec} Signature: {argSpec.GetMethodInfo().DiagName()}>";
         }
 
         public static string DiagName(this ICall call, DiagContextInternal ctx)
         {
-            var methodInfo = call.GetMethodInfo();
             var substituteId = call.Target().SubstituteId(ctx);
-            var arguments =
-                CallFormatter.Format(methodInfo, call.GetOriginalArguments().Select(a => a.GetObjectId(ctx)));
-            var nameAndArgs = CallFormatter.Format(methodInfo, FormatMethodParameterTypes(methodInfo.GetParameters()));
-            var retType = methodInfo.ReturnType.DiagName();
+            var callArgs = call.FormatArgs(ctx);
+            var signature = call.GetMethodInfo().DiagName();
+ 
+            return $"<[{substituteId}].{callArgs} Signature: {signature}>";
+        }
 
-            return $"<{substituteId}.{arguments} : {nameAndArgs} -> {retType}>";
+        public static string FormatArgs(this ICall call, DiagContextInternal ctx)
+        {
+            var methodInfo = call.GetMethodInfo();
+            return CallFormatter.Format(methodInfo, call.GetOriginalArguments().Select(a => a.GetObjectId(ctx)));
         }
 
         public static string DiagName(this Type type)
         {
             return type.GetNonMangledTypeName();
+        }
+
+        public static string DiagName(this MethodInfo methodInfo)
+        {
+            var nameAndArgs = CallFormatter.Format(methodInfo, FormatMethodParameterTypes(methodInfo.GetParameters()));
+            var retType = methodInfo.ReturnType.DiagName();
+
+            return $"{nameAndArgs} -> {retType}";
+
+            IEnumerable<string> FormatMethodParameterTypes(IEnumerable<ParameterInfo> parameters)
+            {
+                return parameters.Select(p =>
+                {
+                    var type = p.ParameterType;
+
+                    if (p.IsOut)
+                        return "out " + type.GetElementType().GetNonMangledTypeName();
+
+                    if (type.IsByRef)
+                        return "ref " + type.GetElementType().GetNonMangledTypeName();
+
+                    if (p.IsParams())
+                        return "params " + type.GetNonMangledTypeName();
+
+                    return type.GetNonMangledTypeName();
+                });
+            }
         }
 
         public static string DiagName<T>(this T value) where T : struct, Enum
@@ -156,9 +182,9 @@ namespace NSubstitute.Community.Diagnostics.Utils
             var typeName = type.GetNonMangledTypeName();
             // Trim "Diagnostics" prefix from type to make output more clear.
             // It doesn't matter to end user whether we have wrapper - we don't alter the logic.
-            if (type.Assembly == Assembly.GetExecutingAssembly() &&
-                typeName.StartsWith("Diagnostics", StringComparison.Ordinal))
-                typeName = typeName.Substring("Diagnostics".Length);
+//            if (type.Assembly == Assembly.GetExecutingAssembly() &&
+//                typeName.StartsWith("Diagnostics", StringComparison.Ordinal))
+//                typeName = typeName.Substring("Diagnostics".Length);
 
             string id;
             if (type == typeof(string))
@@ -198,25 +224,6 @@ namespace NSubstitute.Community.Diagnostics.Utils
             typeName = typeName.Substring(0, typeName.IndexOf('`'));
             var genericArgTypes = type.GetGenericArguments().Select(GetNonMangledTypeName);
             return $"{typeName}<{string.Join(", ", genericArgTypes)}>";
-        }
-
-        private static IEnumerable<string> FormatMethodParameterTypes(IEnumerable<ParameterInfo> parameters)
-        {
-            return parameters.Select(p =>
-            {
-                var type = p.ParameterType;
-
-                if (p.IsOut)
-                    return "out " + type.GetElementType().GetNonMangledTypeName();
-
-                if (type.IsByRef)
-                    return "ref " + type.GetElementType().GetNonMangledTypeName();
-
-                if (p.IsParams())
-                    return "params " + type.GetNonMangledTypeName();
-
-                return type.GetNonMangledTypeName();
-            });
         }
     }
 }

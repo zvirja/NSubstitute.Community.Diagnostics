@@ -1,9 +1,5 @@
-using System;
-using System.Runtime.CompilerServices;
-using System.Transactions;
 using NSubstitute.ClearExtensions;
 using NSubstitute.Extensions;
-using NSubstitute.ReturnsExtensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -11,17 +7,17 @@ namespace NSubstitute.Community.Diagnostics.Tests
 {
     public class IntegrationTests
     {
-        private IDiagnosticsTracer _output;
+        private readonly ITestOutputHelper _output;
 
         public IntegrationTests(ITestOutputHelper output)
         {
-            _output = new TestOutputHelperLogger(output);
+            _output = output;
         }
 
         [Fact]
         public void Test()
         {
-            using (new NSubstituteDiagnosticsContext(_output))
+            using (NSubstituteDiagnosticsContext.CreateTracingContext(_output.WriteLine))
             {
                 ClearOptions xx = ClearOptions.All;
                 xx.ToString();

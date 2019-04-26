@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using NSubstitute.Community.Diagnostics.Decorators;
+using NSubstitute.Community.Diagnostics.Logging;
 using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Core;
 using NSubstitute.Core.Arguments;
 using NSubstitute.Routing;
 
-namespace NSubstitute.Community.Diagnostics
+namespace NSubstitute.Community.Diagnostics.Decorators
 {
     internal class DiagnosticsThreadLocalContext : IThreadLocalContext
     {
@@ -23,25 +22,25 @@ namespace NSubstitute.Community.Diagnostics
 
         public void SetLastCallRouter(ICallRouter callRouter)
         {
-            Log($"SetLastCallRouter(callRouter: {callRouter.DiagName(_ctx)})");
+            Trace($"SetLastCallRouter(callRouter: {callRouter.DiagName(_ctx)})");
             _impl.SetLastCallRouter(_ctx.MapToDiagRouter(callRouter));
         }
 
         public void ClearLastCallRouter()
         {
-            Log("ClearLastCallRouter()");
+            Trace("ClearLastCallRouter()");
             _impl.ClearLastCallRouter();
         }
 
         public ConfiguredCall LastCallShouldReturn(IReturn value, MatchArgs matchArgs)
         {
-            Log($"LastCallShouldReturn(value: {value.DiagName(_ctx)}, matchArgs: {matchArgs.DiagName()})");
+            Trace($"LastCallShouldReturn(value: {value.DiagName(_ctx)}, matchArgs: {matchArgs.DiagName()})");
             return _impl.LastCallShouldReturn(value, matchArgs);
         }
 
         public void SetNextRoute(ICallRouter callRouter, Func<ISubstituteState, IRoute> nextRouteFactory)
         {
-            Log(
+            Trace(
                 $"SetNextRoute(callRouter: {callRouter.DiagName(_ctx)}, nextRouteFactory: {nextRouteFactory.DiagName()})");
             _impl.SetNextRoute(_ctx.MapToDiagRouter(callRouter), nextRouteFactory);
         }
@@ -49,46 +48,50 @@ namespace NSubstitute.Community.Diagnostics
         public Func<ISubstituteState, IRoute> UseNextRoute(ICallRouter callRouter)
         {
             var result = _impl.UseNextRoute(_ctx.MapToDiagRouter(callRouter));
-            Log($"UseNextRoute(callRouter: {callRouter.DiagName(_ctx)}) => {result.DiagName()}");
+            Trace($"UseNextRoute(callRouter: {callRouter.DiagName(_ctx)}) => {result.DiagName()}");
             return result;
         }
 
         public void EnqueueArgumentSpecification(IArgumentSpecification spec)
         {
-            Log($"EnqueueArgumentSpecification(spec: {spec.DiagName()})");
+            Trace($"EnqueueArgumentSpecification(spec: {spec.DiagName()})");
+            Log($"[Enqueue argument specification] Specification: {spec.DiagName()}");
             _impl.EnqueueArgumentSpecification(spec);
         }
 
         public IList<IArgumentSpecification> DequeueAllArgumentSpecifications()
         {
             var result = _impl.DequeueAllArgumentSpecifications();
-            Log($"DequeueAllArgumentSpecifications() => {result.Print(x => x.DiagName())}");
+            Trace($"DequeueAllArgumentSpecifications() => {result.Print(x => x.DiagName())}");
             return result;
         }
 
         public void SetPendingRaisingEventArgumentsFactory(Func<ICall, object[]> getArguments)
         {
-            Log($"SetPendingRaisingEventArgumentsFactory(getArguments: {getArguments.DiagName()})");
+            Trace($"SetPendingRaisingEventArgumentsFactory(getArguments: {getArguments.DiagName()})");
             _impl.SetPendingRaisingEventArgumentsFactory(getArguments);
         }
 
         public Func<ICall, object[]> UsePendingRaisingEventArgumentsFactory()
         {
             var result = _impl.UsePendingRaisingEventArgumentsFactory();
-            Log($"UsePendingRaisingEventArgumentsFactory() => {result.DiagName()}");
+            Trace($"UsePendingRaisingEventArgumentsFactory() => {result.DiagName()}");
             return result;
         }
 
         public void RunInQueryContext(Action calls, IQuery query)
         {
-            Log($"BEGIN RunInQueryContext()");
-            _impl.RunInQueryContext(calls, query);
-            Log($"END RunInQueryContext()");
+            Trace($"BEGIN RunInQueryContext()");
+            using (_ctx.Logger.Scope())
+            {
+                _impl.RunInQueryContext(calls, query);
+            }
+            Trace($"END RunInQueryContext()");
         }
 
         public void RegisterInContextQuery(ICall call)
         {
-            Log($"RegisterInContextQuery(call: {call.DiagName(_ctx)})");
+            Trace($"RegisterInContextQuery(call: {call.DiagName(_ctx)})");
             _impl.RegisterInContextQuery(call);
         }
 
@@ -96,6 +99,7 @@ namespace NSubstitute.Community.Diagnostics
 
         public bool IsQuerying => _impl.IsQuerying;
 
-        private void Log(string message) => _ctx.Tracer.WriteLineWithTID($"[ThreadLocalContext] {message}");
+        private void Trace(string message) => _ctx.Logger.TraceWithTID($"[ThreadLocalContext] {message}");
+        private void Log(string message) => _ctx.Logger.LogWithTID($"[ThreadLocalContext]{message}");
     }
 }

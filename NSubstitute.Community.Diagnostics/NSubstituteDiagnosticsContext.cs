@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using NSubstitute.Community.Diagnostics.Decorators;
-using NSubstitute.Community.Diagnostics.Utils;
+using NSubstitute.Community.Diagnostics.Logging;
 using NSubstitute.Core;
 using NSubstitute.Core.DependencyInjection;
-using NSubstitute.Proxies;
-using NSubstitute.Proxies.CastleDynamicProxy;
-using NSubstitute.Proxies.DelegateProxy;
 
 namespace NSubstitute.Community.Diagnostics
 {
@@ -14,33 +10,49 @@ namespace NSubstitute.Community.Diagnostics
     {
         private static readonly object InstallLock = new object();
 
+        private readonly IDiagnosticsLogger _logger;
         private readonly ISubstitutionContext _oldContext;
-        public IDiagnosticsTracer Tracer { get; }
 
-        public NSubstituteDiagnosticsContext(Action<string> logger) : this(new LoggingFunctionDiagnosticsTracer(logger))
+        private NSubstituteDiagnosticsContext(Action<string> logger, DiagnosticsLogLevel level)
         {
+            _logger = new FuncLogger(logger, level);
+
+            var diagnosticsContext = CreateContext(_logger);
+            _oldContext = InstallDiagContext(diagnosticsContext, _logger);
         }
 
-        public NSubstituteDiagnosticsContext(IDiagnosticsTracer tracer)
+        /// <summary>
+        /// Installs tracer which performs detailed NSubstitute monitoring suitable for advanced scenarios troubleshoot.
+        /// You should dispose the returned context to resume normal work.
+        /// Notice, context cannot be installed/uninstalled concurrently, as it affects static resources.
+        /// </summary>
+        public static IDisposable CreateTracingContext(Action<string> logger)
         {
-            Tracer = tracer;
-
-            var diagContext = CreateDiagContext(tracer);
-            _oldContext = InstallDiagContext(diagContext, tracer);
+            return new NSubstituteDiagnosticsContext(logger, DiagnosticsLogLevel.Tracing);
         }
 
-        private static ISubstitutionContext CreateDiagContext(IDiagnosticsTracer tracer)
+        /// <summary>
+        /// Installs logger which performs basic NSubstitute monitoring suitable for basic scenarios troubleshoot.
+        /// You should dispose the returned context to resume normal work.
+        /// Notice, context cannot be installed/uninstalled concurrently, as it affects static resources.
+        /// </summary>
+        public static IDisposable CreateLoggingContext(Action<string> logger)
         {
-            var ctx = new DiagContextInternal(tracer);
-
+            return new NSubstituteDiagnosticsContext(logger, DiagnosticsLogLevel.Logging);
+        }
+        
+        private static ISubstitutionContext CreateContext(IDiagnosticsLogger logger)
+        {
+            var diagCtx = new DiagContextInternal(logger);
+            
             return NSubstituteDefaultFactory.DefaultContainer
                 .Customize()
-                .Decorate<IThreadLocalContext>((impl, _) => new DiagnosticsThreadLocalContext(impl, ctx))
-                .Decorate<IProxyFactory>((impl, _) => new DiagnosticsProxyFactory(impl, ctx))
+                .Decorate<IThreadLocalContext>((impl, _) => new DiagnosticsThreadLocalContext(impl, diagCtx))
+                .Decorate<IProxyFactory>((impl, _) => new DiagnosticsProxyFactory(impl, diagCtx))
                 .Resolve<ISubstitutionContext>();
         }
 
-        private static ISubstitutionContext InstallDiagContext(ISubstitutionContext newCtx, IDiagnosticsTracer tracer)
+        private static ISubstitutionContext InstallDiagContext(ISubstitutionContext newCtx, IDiagnosticsLogger logger)
         {
             if (!IsDiagContext(newCtx))
                 throw new ArgumentException(
@@ -60,7 +72,7 @@ namespace NSubstitute.Community.Diagnostics
                 }
 
                 SubstitutionContext.Current = newCtx;
-                Log("Installed diagnostics context", tracer);
+                Log($"Installed diagnostics context", logger);
 
                 return oldContext;
             }
@@ -71,8 +83,8 @@ namespace NSubstitute.Community.Diagnostics
             return context.ThreadContext.GetType() == typeof(DiagnosticsThreadLocalContext);
         }
 
-        private static void Log(string message, IDiagnosticsTracer tracer) =>
-            tracer.WriteLineWithTID($"[DiagnosticsContextInstaller] {message}");
+        private static void Log(string message, IDiagnosticsLogger logger) =>
+            logger.WriteLineWithTID($"[DiagnosticsContextInstaller] {message}");
 
         public void Dispose()
         {
@@ -88,7 +100,7 @@ namespace NSubstitute.Community.Diagnostics
                         "In that case please ensure that you run tests sequentially or install the hook globally on an assembly level.");
 
                 SubstitutionContext.Current = _oldContext;
-                Log("Restored normal context", Tracer);
+                Log("Restored normal context", _logger);
             }
         }
     }

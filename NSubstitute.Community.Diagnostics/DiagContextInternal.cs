@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using NSubstitute.Community.Diagnostics.Logging;
+using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Core;
 
 namespace NSubstitute.Community.Diagnostics
@@ -14,11 +16,11 @@ namespace NSubstitute.Community.Diagnostics
             new ConditionalWeakTable<ICallRouter, ICallRouter>();
 
         private ConditionalWeakTable<object, Type> _substituteToPrimaryType = new ConditionalWeakTable<object, Type>();
-        public IDiagnosticsTracer Tracer { get; }
+        public IndentedLogger Logger { get; }
 
-        public DiagContextInternal(IDiagnosticsTracer tracer)
+        public DiagContextInternal(IDiagnosticsLogger logger)
         {
-            Tracer = tracer;
+            Logger = new IndentedLogger(logger);
         }
 
         public void MapRouterToSubstitute(ICallRouter router, object substitute)

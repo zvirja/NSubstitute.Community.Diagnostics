@@ -1,4 +1,5 @@
 using System;
+using NSubstitute.Community.Diagnostics.Logging;
 using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Core;
 
@@ -23,7 +24,7 @@ namespace NSubstitute.Community.Diagnostics.Decorators
 
             _ctx.RegisterPrimaryProxyType(result, typeToProxy);
 
-            Log(
+            LogAndTrace(
                 $"GenerateProxy(callRouter: {callRouter.DiagName(_ctx)}, " +
                 $"typeToProxy: {typeToProxy.FullName}, " +
                 $"additionalInterfaces: {additionalInterfaces.Print(x => x.FullName)}, " +
@@ -39,6 +40,6 @@ namespace NSubstitute.Community.Diagnostics.Decorators
 
         public override int GetHashCode() => _impl.GetHashCode();
 
-        private void Log(string message) => _ctx.Tracer.WriteLineWithTID($"[ProxyFactory] {message}");
+        private void LogAndTrace(string message) => _ctx.Logger.WriteLineWithTID($"[ProxyFactory] {message}");
     }
 }
