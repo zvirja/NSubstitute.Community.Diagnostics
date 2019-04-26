@@ -27,7 +27,8 @@ namespace NSubstitute.Community.Diagnostics.Decorators
             Log($"[Configure last call] " +
                 $"CallSpecification: {pendingSpecInfo.DiagName(_ctx)} " +
                 $"Value: {returnValue.DiagName(_ctx)} " +
-                $"Match: {matchArgs.DiagName()}");
+                $"Match: {matchArgs.DiagName()} " +
+                $"Caller: {StackUtil.GetCallerMethodName()}");
  
             return _impl.LastCallShouldReturn(returnValue, matchArgs, pendingSpecInfo);
         }
@@ -39,7 +40,8 @@ namespace NSubstitute.Community.Diagnostics.Decorators
                 $"Substitute: {call.Target().SubstituteId(_ctx)} " +
                 $"Call: {call.FormatArgs(_ctx)} " +
                 $"Signature: {call.GetMethodInfo().DiagName()} " +
-                $"Pending specs: {call.GetArgumentSpecifications().Print(s => s.DiagName())}");
+                $"Pending specs: {call.GetArgumentSpecifications().Print(s => s.DiagName())} " +
+                $"Caller: {StackUtil.GetCallerMethodName()}");
             
             using (_ctx.Logger.Scope())
             {

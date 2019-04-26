@@ -55,7 +55,9 @@ namespace NSubstitute.Community.Diagnostics.Decorators
         public void EnqueueArgumentSpecification(IArgumentSpecification spec)
         {
             Trace($"EnqueueArgumentSpecification(spec: {spec.DiagName()})");
-            Log($"[Enqueue argument specification] Specification: {spec.DiagName()}");
+            Log($"[Enqueue argument specification] " +
+                $"Specification: {spec.DiagName()} " +
+                $"Caller: {StackUtil.GetCallerMethodName()}");
             _impl.EnqueueArgumentSpecification(spec);
         }
 
