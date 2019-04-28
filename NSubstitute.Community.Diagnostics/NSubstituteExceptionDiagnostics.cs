@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using NSubstitute.Community.Diagnostics.Logging;
@@ -107,7 +108,7 @@ namespace NSubstitute.Community.Diagnostics
                    "************************************************************************" +
                    Environment.NewLine +
                    Environment.NewLine +
-                   string.Join(Environment.NewLine, logEntries) +
+                   FormatLogEntries(logEntries) +
                    Environment.NewLine +
                    Environment.NewLine +
                    "************************************************************************" +
@@ -115,6 +116,16 @@ namespace NSubstitute.Community.Diagnostics
                    "************************************************************************" +
                    Environment.NewLine +
                    Environment.NewLine;
+        }
+
+        private static string FormatLogEntries(string[] logEntries)
+        {
+            const int Limit = 100;
+
+            var entries = logEntries.Length <= Limit
+                ? logEntries
+                : logEntries.Take(Limit).Concat(new[] {$"... log is trimmed to show only last {Limit} entries..."});
+            return string.Join(Environment.NewLine, entries);
         }
 
         private static void PatchExceptionMessage(Exception ex, string newMessage)
