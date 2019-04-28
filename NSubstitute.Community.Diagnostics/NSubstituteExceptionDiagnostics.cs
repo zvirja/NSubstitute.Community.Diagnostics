@@ -103,7 +103,7 @@ namespace NSubstitute.Community.Diagnostics
                    Environment.NewLine +
                    "************************************************************************" +
                    Environment.NewLine +
-                   "***************************  LOG (reversed)  ***************************" +
+                   "*********************  NSubstitute LOG (reversed)  *********************" +
                    Environment.NewLine +
                    "************************************************************************" +
                    Environment.NewLine +
