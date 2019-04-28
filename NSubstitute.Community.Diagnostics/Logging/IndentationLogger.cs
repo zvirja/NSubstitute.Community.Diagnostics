@@ -3,15 +3,15 @@ namespace NSubstitute.Community.Diagnostics.Logging
     internal class IndentationLogger : IDiagnosticsLogger
     {
 
-        private readonly IDiagnosticsLogger _impl;
+        private readonly IDiagnosticsLogger _next;
  
-        public IndentationLogger(IDiagnosticsLogger impl)
+        public IndentationLogger(IDiagnosticsLogger next)
         {
-            _impl = impl;
+            _next = next;
         }
 
-        public DiagnosticsLogLevel Level => _impl.Level;
+        public DiagnosticsLogLevel Level => _next.Level;
 
-        public void WriteLine(string line) => _impl.WriteLine(LoggingScope.GetIndentation() + line);
+        public void WriteLine(string line) => _next.WriteLine(LoggingScope.GetIndentation() + line);
     }
 }

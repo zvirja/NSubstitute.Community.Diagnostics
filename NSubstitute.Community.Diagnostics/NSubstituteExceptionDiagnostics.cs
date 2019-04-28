@@ -2,39 +2,56 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using System.Threading;
 using NSubstitute.Community.Diagnostics.Logging;
+using NSubstitute.Community.Diagnostics.Utils;
 using NSubstitute.Exceptions;
 
 namespace NSubstitute.Community.Diagnostics
 {
-    public static class NSubstituteExceptionDiagnoser
+    public static class NSubstituteExceptionDiagnostics
     {
-        private static int _isInstalled;
+        private static readonly object InstallLock = new object();
 
         [ThreadStatic] private static Stack<string> _logEntries;
 
+        private static IDisposable _diagContext;
+
         /// <summary>
         /// Installs global NSubstitute logger and exception listener.
-        /// Whenever NSubstitute exception is thrown, NSubstitute log is attached.
+        /// Whenever NSubstitute exception is thrown, NSubstitute internal log is attached.
         /// </summary>
-        /// <exception cref="InvalidOperationException"></exception>
-        public static void Install()
+        public static IDisposable Install()
         {
-            if (Interlocked.CompareExchange(ref _isInstalled, 1, 0) != 0)
+            lock (InstallLock)
             {
-                throw new InvalidOperationException("Diagnoser is already installed.");
+                if (IsDiagnosticsContextInstalled())
+                    throw new InvalidOperationException(
+                        "Exception diagnostics is already installed. " +
+                        "Ensure that hook is installed only once globally on assembly level.");
+
+                InstallDiagnosticsContext();
+                InstallExceptionHook();
             }
 
-            InstallDiagnosticsContext();
-            InstallExceptionHook();
+            return new DelegatingDisposable(() =>
+            {
+                lock (InstallLock)
+                {
+                    if (!IsDiagnosticsContextInstalled())
+                        throw new InvalidOperationException("Exception diagnostics is not installed.");
+
+                    UninstallDiagnosticsContext();
+                    UninstallExceptionHook();
+                }
+            });
         }
+
+        private static bool IsDiagnosticsContextInstalled() => _diagContext != null;
 
         private static void InstallDiagnosticsContext()
         {
-            // Context is installed on creation, so we just do nothing with the object.
-            // Current API doesn't allow to uninstall context, so we forget the object.
-            new NSubstituteDiagnosticsContext(
+            // Installer throws in case of concurrency, so if method returns - everything is fine.
+            _diagContext = NSubstituteDiagnosticsContext.Install(
                 new CallerLogger(
                     new IndentationLogger(
                         new FuncLogger(
@@ -50,9 +67,20 @@ namespace NSubstitute.Community.Diagnostics
                             DiagnosticsLogLevel.Logging))));
         }
 
+        private static void UninstallDiagnosticsContext()
+        {
+            _diagContext.Dispose();
+            _diagContext = null;
+        }
+
         private static void InstallExceptionHook()
         {
             AppDomain.CurrentDomain.FirstChanceException += OnException;
+        }
+        
+        private static void UninstallExceptionHook()
+        {
+            AppDomain.CurrentDomain.FirstChanceException -= OnException;
         }
 
         private static void OnException(object sender, FirstChanceExceptionEventArgs e)

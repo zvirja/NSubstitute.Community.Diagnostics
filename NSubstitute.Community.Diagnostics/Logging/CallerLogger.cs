@@ -10,16 +10,16 @@ namespace NSubstitute.Community.Diagnostics.Logging
         private static readonly Assembly NSubstituteAssembly = typeof(Substitute).Assembly;
         private static readonly Assembly CastleProxyAssembly = typeof(ProxyGenerator).Assembly;
         private static readonly Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
-        private readonly IDiagnosticsLogger _impl;
+        private readonly IDiagnosticsLogger _next;
 
-        public CallerLogger(IDiagnosticsLogger impl)
+        public CallerLogger(IDiagnosticsLogger next)
         {
-            _impl = impl;
+            _next = next;
         }
 
-        public DiagnosticsLogLevel Level => _impl.Level;
+        public DiagnosticsLogLevel Level => _next.Level;
 
-        public void WriteLine(string line) => _impl.WriteLine($"[Caller: {GetCallerMethodName()}]{line}");
+        public void WriteLine(string line) => _next.WriteLine($"[Caller: {GetCallerMethodName()}]{line}");
  
         private static string GetCallerMethodName()
         {

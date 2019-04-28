@@ -182,9 +182,9 @@ namespace NSubstitute.Community.Diagnostics.Utils
             var typeName = type.GetNonMangledTypeName();
             // Trim "Diagnostics" prefix from type to make output more clear.
             // It doesn't matter to end user whether we have wrapper - we don't alter the logic.
-//            if (type.Assembly == Assembly.GetExecutingAssembly() &&
-//                typeName.StartsWith("Diagnostics", StringComparison.Ordinal))
-//                typeName = typeName.Substring("Diagnostics".Length);
+            if (type.Assembly == Assembly.GetExecutingAssembly() &&
+                typeName.StartsWith("Diagnostics", StringComparison.Ordinal))
+                typeName = typeName.Substring("Diagnostics".Length);
 
             string id;
             if (type == typeof(string))

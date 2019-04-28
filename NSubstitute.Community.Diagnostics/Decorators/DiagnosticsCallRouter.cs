@@ -39,7 +39,7 @@ namespace NSubstitute.Community.Diagnostics.Decorators
                 $"Substitute: {call.Target().SubstituteId(_ctx)} " +
                 $"Call: {call.FormatArgs(_ctx)} " +
                 $"Signature: {call.GetMethodInfo().DiagName()} " +
-                $"Pending specs: {call.GetArgumentSpecifications().Print(s => s.DiagName())}");
+                $"Argument specifications: {call.GetArgumentSpecifications().Print(s => s.DiagName())}");
             
             using (new LoggingScope())
             {
