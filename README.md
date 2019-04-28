@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/7xumirowuxo3hfrv/branch/master?svg=true)](https://ci.appveyor.com/project/Zvirja/nsubstitute-community-diagnostics/branch/master) [![NuGet version](https://img.shields.io/nuget/vpre/NSubstitute.Community.Diagnostics.svg)](https://www.nuget.org/packages/NSubstitute.Community.Diagnostics)
+
 # NSubstitute.Community.Diagnostics
 
 A tool to quickly identify the NSubstitute related issues. It overrides the most critical parts of NSubstitute to log most important actions. Later log might be used to quickly figure out the reason of misbehavior.

@@ -7,7 +7,7 @@ open System.Text.RegularExpressions
 
 let buildDir = getBuildParamOrDefault "BuildDir" "build"
 let buildToolsDir = buildDir </> "tools"
-let nuGetOutputFolder = buildDir </> "nugetPackages"
+let nuGetOutputFolder = buildDir </> "NuGetPackages"
 let nuGetPackages = !! (nuGetOutputFolder </> "*.nupkg" )
                     // Skip symbol packages because NuGet publish symbols automatically when package is published.
                     -- (nuGetOutputFolder </> "*.symbols.nupkg")

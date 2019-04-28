@@ -346,3 +346,6 @@ MigrationBackup/
 
 # Temp build artifacts and tools
 build/
+
+# Vim swap file
+*.swp
