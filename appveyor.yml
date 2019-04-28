@@ -2,7 +2,7 @@ image: Visual Studio 2017
 
 environment:
   NUGET_API_KEY:
-    secure: xxx
+    secure: w6JiRUAPvzSvUIOBY0NXqoZKKgsUgBZLMDWbUKFlXUa0dzkHe6rpMa2n/ep54fg4
 
 pull_requests:
   do_not_increment_build_number: true
