@@ -57,7 +57,7 @@ namespace NSubstitute.Community.Diagnostics.Decorators
         public void SetRoute(Func<ISubstituteState, IRoute> getRoute)
         {
             Trace($"SetRoute(routeFactory: {getRoute.DiagName()})");
-#pragma warning disable 618 - Just proxy it.
+#pragma warning disable 618 // Just proxy it.
             _impl.SetRoute(getRoute);
 #pragma warning restore 618
         }
