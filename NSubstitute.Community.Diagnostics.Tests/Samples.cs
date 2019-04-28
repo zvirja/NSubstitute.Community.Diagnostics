@@ -1,5 +1,7 @@
 using NSubstitute;
+using NSubstitute.ClearExtensions;
 using NSubstitute.Community.Diagnostics;
+using NSubstitute.Community.Diagnostics.Tests;
 using NSubstitute.Extensions;
 using Xunit;
 using Xunit.Abstractions;
@@ -24,6 +26,24 @@ namespace Samples
                 sut.Echo((byte)42);
 
                 sut.Prop = 42;
+            }
+        }
+        
+        [Fact]
+        public void ComplexScenario()
+        {
+            using (NSubstituteDiagnosticsContext.InstallTracingContext(_output.WriteLine))
+            {
+                ClearOptions xx = ClearOptions.All;
+                xx.ToString();
+
+                var subs = Substitute.For<ISut>();
+                var res = Substitute.For<ISut>();
+                subs.Configure().GetSelf(Arg.Any<long>()).Returns(res);
+
+                subs.ClearSubstitute(ClearOptions.ReturnValues | ClearOptions.ReceivedCalls);
+
+                var result = subs.Echo(42);
             }
         }
     }

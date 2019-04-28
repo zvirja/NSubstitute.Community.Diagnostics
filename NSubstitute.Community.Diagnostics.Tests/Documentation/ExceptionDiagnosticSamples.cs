@@ -5,7 +5,7 @@ namespace NSubstitute.Community.Diagnostics.Tests.Documentation
 {
     public class ExceptionDiagnosticSamples
     {
-        [Fact]
+        [Fact(Skip = "For doc only")]
         public void RunTests()
         {
             using (NSubstituteExceptionDiagnostics.Install())
