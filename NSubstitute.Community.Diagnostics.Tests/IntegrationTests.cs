@@ -17,7 +17,7 @@ namespace NSubstitute.Community.Diagnostics.Tests
         [Fact]
         public void Test()
         {
-            using (NSubstituteDiagnosticsContext.CreateTracingContext(_output.WriteLine))
+            using (NSubstituteDiagnosticsContext.InstallTracingContext(_output.WriteLine))
             {
                 ClearOptions xx = ClearOptions.All;
                 xx.ToString();
