@@ -34,12 +34,10 @@ namespace Samples
         {
             using (NSubstituteDiagnosticsContext.InstallTracing(_output.WriteLine))
             {
-                ClearOptions xx = ClearOptions.All;
-                xx.ToString();
-
                 var subs = Substitute.For<ISut>();
-                var res = Substitute.For<ISut>();
-                subs.Configure().GetSelf(Arg.Any<long>()).Returns(res);
+                //var res = Substitute.For<ISut>();
+                //subs.Configure().GetSelf(Arg.Any<long>()).Returns(res);
+                subs.Echo(42).Returns( _ => 24);
 
                 subs.ClearSubstitute(ClearOptions.ReturnValues | ClearOptions.ReceivedCalls);
 

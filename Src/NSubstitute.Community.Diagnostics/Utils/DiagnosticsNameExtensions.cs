@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -55,7 +56,7 @@ namespace NSubstitute.Community.Diagnostics.Utils
                 return ReflectionReader.ReadFieldValue(
                     value,
                     "_valuesToReturn",
-                    (IEnumerable<object> objs) => objs.Print(o => o.GetObjectId(ctx)),
+                    (IEnumerable objs) => objs.Cast<object>().Print(o => o.GetObjectId(ctx)),
                     "<MVALUES|CANNOT_READ>");
             }
 
