@@ -35,7 +35,7 @@ namespace NSubstitute.Community.Diagnostics
         /// You should dispose the returned context to resume normal work.
         /// Notice, context cannot be installed/uninstalled concurrently, as it affects static resources.
         /// </summary>
-        public static IDisposable InstallTracingContext(Action<string> logger)
+        public static IDisposable InstallTracing(Action<string> logger)
         {
             return Install(
                 new CallerLogger(
@@ -49,7 +49,7 @@ namespace NSubstitute.Community.Diagnostics
         /// You should dispose the returned context to resume normal work.
         /// Notice, context cannot be installed/uninstalled concurrently, as it affects static resources.
         /// </summary>
-        public static IDisposable InstallLoggingContext(Action<string> logger)
+        public static IDisposable InstallLogging(Action<string> logger)
         {
             return Install(
                 new CallerLogger(

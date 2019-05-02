@@ -9,7 +9,7 @@ namespace NSubstitute.Community.Diagnostics.Tests.Documentation
     {
         public void WritingToConsoleLoggingSample()
         {
-            using (NSubstituteDiagnosticsContext.InstallLoggingContext(Console.WriteLine))
+            using (NSubstituteDiagnosticsContext.InstallLogging(Console.WriteLine))
             {
                 var substitute = Substitute.For<ISut>();
                 substitute.Echo(42).Returns(42);
@@ -18,7 +18,7 @@ namespace NSubstitute.Community.Diagnostics.Tests.Documentation
 
         public void WritingToConsoleTracingSample()
         {
-            using (NSubstituteDiagnosticsContext.InstallTracingContext(Console.WriteLine))
+            using (NSubstituteDiagnosticsContext.InstallTracing(Console.WriteLine))
             {
                 var substitute = Substitute.For<ISut>();
                 substitute.Echo(42).Returns(42);
@@ -33,7 +33,7 @@ namespace NSubstitute.Community.Diagnostics.Tests.Documentation
             [Fact]
             public void DiagnosticsSample()
             {
-                using (NSubstituteDiagnosticsContext.InstallTracingContext(_output.WriteLine))
+                using (NSubstituteDiagnosticsContext.InstallTracing(_output.WriteLine))
                 {
                     var substitute = Substitute.For<ISut>();
                     substitute.Echo(42).Returns(42);

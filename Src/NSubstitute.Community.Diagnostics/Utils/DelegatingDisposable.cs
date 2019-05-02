@@ -2,7 +2,7 @@ using System;
 
 namespace NSubstitute.Community.Diagnostics.Utils
 {
-    public class DelegatingDisposable : IDisposable
+    internal class DelegatingDisposable : IDisposable
     {
         private readonly Action _onDispose;
 

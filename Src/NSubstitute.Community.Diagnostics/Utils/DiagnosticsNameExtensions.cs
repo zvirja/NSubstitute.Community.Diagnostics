@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using NSubstitute.Core;
 using NSubstitute.Core.Arguments;
 
@@ -217,13 +218,62 @@ namespace NSubstitute.Community.Diagnostics.Utils
 
         private static string GetNonMangledTypeName(this Type type)
         {
-            var typeName = type.Name;
-            if (!type.GetTypeInfo().IsGenericType)
-                return typeName;
+            // Implementation copied from NSubstitute:
+            // https://github.com/nsubstitute/NSubstitute/blob/d02239799fdfdca8332fa2600eecd8c8df5ec784/src/NSubstitute/Core/Extensions.cs#L50
+            
+            // Handle simple case without invoking more complex logic.
+            if (!type.GetTypeInfo().IsGenericType && !type.IsNested)
+            {
+                return type.Name;
+            }
 
-            typeName = typeName.Substring(0, typeName.IndexOf('`'));
-            var genericArgTypes = type.GetGenericArguments().Select(GetNonMangledTypeName);
-            return $"{typeName}<{string.Join(", ", genericArgTypes)}>";
+            Type[] genericTypeArguments = type.GetGenericArguments();
+            int alreadyHandledGenericArgumentsCount = 0;
+            var resultTypeName = new StringBuilder();
+
+            void AppendTypeNameRecursively(Type currentType)
+            {
+                Type declaringType = currentType.DeclaringType;
+                if (declaringType != null)
+                {
+                    AppendTypeNameRecursively(declaringType);
+                    resultTypeName.Append("+");
+                }
+
+                resultTypeName.Append(GetTypeNameWithoutGenericArity(currentType));
+
+                // When you take the generic type arguments for a nested type, the type arguments from parent types
+                // are included as well. We don't want to include them again, so simply skip all the already
+                // handled arguments.
+                // Notice, we expect generic type arguments order to always be parent to child, left to right.
+                string[] ownGenericArguments = genericTypeArguments
+                    .Take(currentType.GetGenericArguments().Length)
+                    .Skip(alreadyHandledGenericArgumentsCount)
+                    .Select(t => t.GetNonMangledTypeName())
+                    .ToArray();
+
+                if (ownGenericArguments.Length == 0)
+                {
+                    return;
+                }
+
+                alreadyHandledGenericArgumentsCount += ownGenericArguments.Length;
+
+                resultTypeName.Append("<");
+                resultTypeName.Append(string.Join(", ", ownGenericArguments));
+                resultTypeName.Append(">");
+            }
+
+            AppendTypeNameRecursively(type);
+            return resultTypeName.ToString();
+
+            string GetTypeNameWithoutGenericArity(Type t)
+            {
+                var tn = t.Name;
+                var indexOfBacktick = tn.IndexOf('`');
+                // For nested generic types the back stick symbol might be missing.
+                return indexOfBacktick > -1 ? tn.Substring(0, indexOfBacktick) : tn;
+            }
         }
     }
 }

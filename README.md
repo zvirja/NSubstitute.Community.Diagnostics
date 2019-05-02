@@ -23,14 +23,14 @@ NSubstituteExceptionDiagnostics.Install();
 
 Later whever NSubstitute exception occur, look for the `**  NSubstitute LOG (reversed)  **` section in the exception message for more clues. See below for example.
 
-##  NSubstiute logging
+##  NSubstitute logging
 
 This diagnostics allows you to install global hook to monitor all the important NSubstitute library activity. You might use either logging or tracing mode, depending on amount of details you require.
 
 To log NSubstitute wrap your test code with the diagnostics context:
 
 ```c#
-using (NSubstituteDiagnosticsContext.InstallLoggingContext(Console.WriteLine))
+using (NSubstituteDiagnosticsContext.InstallLogging(Console.WriteLine))
 {
     var substitute = Substitute.For<ISut>();
     substitute.Echo(42).Returns(42);
@@ -40,7 +40,7 @@ using (NSubstituteDiagnosticsContext.InstallLoggingContext(Console.WriteLine))
 To get more detailed output use tracing mode:
 
 ```c#
-using (NSubstituteDiagnosticsContext.InstallTracingContext(Console.WriteLine))
+using (NSubstituteDiagnosticsContext.InstallTracing(Console.WriteLine))
 {
     var substitute = Substitute.For<ISut>();
     substitute.Echo(42).Returns(42);
@@ -62,7 +62,7 @@ public class xUnitSample
     [Fact]
     public void DiagnosticsSample()
     {
-        using (NSubstituteDiagnosticsContext.InstallLoggingContext(_output.WriteLine))
+        using (NSubstituteDiagnosticsContext.InstallLogging(_output.WriteLine))
         {
             var substitute = Substitute.For<ISut>();
             substitute.Echo(42).Returns(42);
@@ -125,7 +125,7 @@ public class xUnitSample
     [Fact]
     public void DiagnosticsSample()
     {
-        using (NSubstituteDiagnosticsContext.InstallLoggingContext(_output.WriteLine))
+        using (NSubstituteDiagnosticsContext.InstallLogging(_output.WriteLine))
         {
             var substitute = Substitute.For<ISut>();
             substitute.Echo(42).Returns(42);

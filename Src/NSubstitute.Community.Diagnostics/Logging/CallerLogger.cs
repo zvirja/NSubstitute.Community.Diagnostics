@@ -36,10 +36,9 @@ namespace NSubstitute.Community.Diagnostics.Logging
             {
                 var method = stackFrame.GetMethod();
                 var declaringAssembly = method.DeclaringType?.Assembly;
-                if(declaringAssembly == null)
-                    continue;
 
-                if (declaringAssembly == NSubstituteAssembly ||
+                if (declaringAssembly == null ||
+                    declaringAssembly == NSubstituteAssembly ||
                     declaringAssembly == CurrentAssembly ||
                     declaringAssembly == CastleProxyAssembly ||
                     declaringAssembly.IsDynamic)

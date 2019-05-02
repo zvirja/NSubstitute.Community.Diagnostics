@@ -18,7 +18,7 @@ namespace Samples
         public void IssueDemo()
         {
 //            using (NSubstituteDiagnosticsContext.CreateTracingContext(_output.WriteLine))
-            using (NSubstituteDiagnosticsContext.InstallLoggingContext(_output.WriteLine))
+            using (NSubstituteDiagnosticsContext.InstallLogging(_output.WriteLine))
             {
                 var sut = Substitute.For<ISut>();
                 sut.Configure().Echo(Arg.Any<int>()).Returns(42);
@@ -32,7 +32,7 @@ namespace Samples
         [Fact]
         public void ComplexScenario()
         {
-            using (NSubstituteDiagnosticsContext.InstallTracingContext(_output.WriteLine))
+            using (NSubstituteDiagnosticsContext.InstallTracing(_output.WriteLine))
             {
                 ClearOptions xx = ClearOptions.All;
                 xx.ToString();
