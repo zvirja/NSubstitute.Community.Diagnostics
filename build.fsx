@@ -9,8 +9,6 @@ let buildDir = getBuildParamOrDefault "BuildDir" "build"
 let buildToolsDir = buildDir </> "tools"
 let nuGetOutputFolder = buildDir </> "NuGetPackages"
 let nuGetPackages = !! (nuGetOutputFolder </> "*.nupkg" )
-                    // Skip symbol packages because NuGet publish symbols automatically when package is published.
-                    -- (nuGetOutputFolder </> "*.symbols.nupkg")
 let solutionToBuild = "src/NSubstitute.Community.Diagnostics.sln"
 let testProjectDir = "src/NSubstitute.Community.Diagnostics.Tests"
 let configuration = getBuildParamOrDefault "BuildConfiguration" "Release"
@@ -106,12 +104,12 @@ Target "CleanNuGetPackages" (fun _ ->
 
 Target "NuGetPack" (fun _ ->
     // Pack projects using MSBuild.
-    runDotNet "pack" configuration [ "IncludeSource", "true"
-                                     "IncludeSymbols", "true"
+    runDotNet "pack" configuration [ "IncludeSymbols", "true"
+                                     "SymbolPackageFormat", "snupkg"
                                      "PackageOutputPath", FullName nuGetOutputFolder ]
 )
 
-let publishPackagesWithSymbols packageFeed symbolFeed accessKey =
+let publishPackagesWithSymbols packageFeed accessKey =
     nuGetPackages
     |> Seq.map (fun pkg ->
         let meta = GetMetaDataFromPackageFile pkg
@@ -122,8 +120,6 @@ let publishPackagesWithSymbols packageFeed symbolFeed accessKey =
                                                                       OutputPath = nuGetOutputFolder
                                                                       PublishUrl = packageFeed
                                                                       AccessKey = accessKey
-                                                                      SymbolPublishUrl = symbolFeed
-                                                                      SymbolAccessKey = accessKey
                                                                       WorkingDir = nuGetOutputFolder
                                                                       ToolPath = buildToolsDir </> "nuget.exe" }))
 
@@ -131,7 +127,7 @@ Target "PublishNuGetPublic" (fun _ ->
     let feed = "https://www.nuget.org/api/v2/package"
     let key = getBuildParam "NuGetPublicKey"
 
-    publishPackagesWithSymbols feed "" key
+    publishPackagesWithSymbols feed key
 )
 
 Target "CompleteBuild"   DoNothing

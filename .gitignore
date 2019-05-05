@@ -349,3 +349,6 @@ build/
 
 # Vim swap file
 *.swp
+
+# VS Code tmp files
+.vscode

@@ -16,6 +16,8 @@ test: off
 artifacts:
 - path: build\NuGetPackages\*.nupkg
   name: NuGet
+- path: build\NuGetPackages\*.snupkg
+  name: NuGet
 
 deploy: off
 

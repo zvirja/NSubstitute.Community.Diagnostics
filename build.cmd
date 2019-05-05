@@ -11,7 +11,7 @@ IF NOT EXIST %TOOLS_DIR%\ (
 
 IF NOT EXIST %NUGET_PATH% (
   echo Downloading NuGet.exe ...
-  powershell -Command "Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/v4.3.0/nuget.exe -OutFile %NUGET_PATH%"
+  powershell -Command "Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/v4.9.4/nuget.exe -OutFile %NUGET_PATH%"
 )
 
 IF NOT EXIST "%TOOLS_DIR%\FAKE.Core\tools\Fake.exe" (
