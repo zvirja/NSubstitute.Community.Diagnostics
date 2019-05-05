@@ -1,5 +1,4 @@
 using System;
-using Samples;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -7,6 +6,7 @@ namespace NSubstitute.Community.Diagnostics.Tests.Documentation
 {
     public class LoggingSamples
     {
+        [Fact]
         public void WritingToConsoleLoggingSample()
         {
             using (NSubstituteDiagnosticsContext.InstallLogging(Console.WriteLine))
@@ -16,6 +16,7 @@ namespace NSubstitute.Community.Diagnostics.Tests.Documentation
             }
         }
 
+        [Fact]
         public void WritingToConsoleTracingSample()
         {
             using (NSubstituteDiagnosticsContext.InstallTracing(Console.WriteLine))

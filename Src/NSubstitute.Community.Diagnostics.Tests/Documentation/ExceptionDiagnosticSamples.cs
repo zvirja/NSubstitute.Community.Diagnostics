@@ -1,4 +1,3 @@
-using Samples;
 using Xunit;
 
 namespace NSubstitute.Community.Diagnostics.Tests.Documentation
