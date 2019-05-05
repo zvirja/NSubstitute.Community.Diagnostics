@@ -7,6 +7,9 @@ using NSubstitute.Core.DependencyInjection;
 
 namespace NSubstitute.Community.Diagnostics
 {
+    /// <summary>
+    /// Set of helpers to setup logging for NSubstitute.
+    /// </summary>
     public static class NSubstituteDiagnosticsContext
     {
         private static readonly object InstallLock = new object();

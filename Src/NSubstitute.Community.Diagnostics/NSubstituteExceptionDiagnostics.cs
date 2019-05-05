@@ -9,6 +9,9 @@ using NSubstitute.Exceptions;
 
 namespace NSubstitute.Community.Diagnostics
 {
+    /// <summary>
+    /// Set of diagnostics to improve NSubstitute exceptions information.
+    /// </summary>
     public static class NSubstituteExceptionDiagnostics
     {
         private static readonly object InstallLock = new object();
