@@ -21,7 +21,9 @@ NSubstituteExceptionDiagnostics.Install();
 
 ```
 
-Later whever NSubstitute exception occur, look for the `**  NSubstitute LOG (reversed)  **` section in the exception message for more clues. See below for example.
+Later whever NSubstitute exception occur, look for the `**  NSubstitute LOG (reversed)  **` section in the exception message for more clues.
+
+[See output sample.](#nsubstitute-exception-message-with-enabled-exceptions-diagnostics)
 
 ##  NSubstitute logging
 
